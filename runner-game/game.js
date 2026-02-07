@@ -1,64 +1,87 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-let player = { x: 180, y: 500, width: 40, height: 40, color: "red" };
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let player = { x: 50, y: canvas.height - 100, width: 50, height: 50, dy: 0, jumping: false };
 let obstacles = [];
 let score = 0;
+let highScore = localStorage.getItem("highScore") || 0;
 
-// Draw player
+document.getElementById("highScore").textContent = highScore;
+
 function drawPlayer() {
-  ctx.fillStyle = player.color;
+  ctx.fillStyle = "blue";
   ctx.fillRect(player.x, player.y, player.width, player.height);
 }
 
-// Draw obstacles
 function drawObstacles() {
-  ctx.fillStyle = "black";
+  ctx.fillStyle = "red";
   obstacles.forEach(o => ctx.fillRect(o.x, o.y, o.width, o.height));
 }
 
-// Update obstacles
 function updateObstacles() {
-  obstacles.forEach(o => o.y += 5);
-  obstacles = obstacles.filter(o => o.y < canvas.height);
+  obstacles.forEach(o => o.x -= 5);
+  obstacles = obstacles.filter(o => o.x + o.width > 0);
 
-  if (Math.random() < 0.03) {
-    obstacles.push({ x: Math.random() * 360, y: -20, width: 40, height: 40 });
+  if (Math.random() < 0.02) {
+    obstacles.push({ x: canvas.width, y: canvas.height - 50, width: 50, height: 50 });
   }
 }
 
-// Collision detection
 function checkCollision() {
-  for (let o of obstacles) {
-    if (
-      player.x < o.x + o.width &&
-      player.x + player.width > o.x &&
-      player.y < o.y + o.height &&
-      player.y + player.height > o.y
-    ) {
-      alert("Game Over! Final Score: " + score);
-      document.location.reload();
-    }
+  return obstacles.some(o =>
+    player.x < o.x + o.width &&
+    player.x + player.width > o.x &&
+    player.y < o.y + o.height &&
+    player.y + player.height > o.y
+  );
+}
+
+function jump() {
+  if (!player.jumping) {
+    player.dy = -15;
+    player.jumping = true;
   }
 }
 
-// Game loop
+document.addEventListener("keydown", e => {
+  if (e.code === "Space") jump();
+});
+
+document.addEventListener("touchstart", jump);
+
+function updatePlayer() {
+  player.y += player.dy;
+  player.dy += 1; // gravity
+  if (player.y >= canvas.height - 100) {
+    player.y = canvas.height - 100;
+    player.dy = 0;
+    player.jumping = false;
+  }
+}
+
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   drawPlayer();
   drawObstacles();
+  updatePlayer();
   updateObstacles();
-  checkCollision();
+
+  if (checkCollision()) {
+    if (score > highScore) {
+      localStorage.setItem("highScore", score);
+    }
+    alert("Game Over! Your score: " + score);
+    document.location.reload();
+  }
+
   score++;
-  ctx.fillStyle = "black";
-  ctx.fillText("Score: " + score, 10, 20);
+  document.getElementById("score").textContent = score;
+
   requestAnimationFrame(gameLoop);
 }
 
 gameLoop();
-
-// Controls
-document.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowLeft" && player.x > 0) player.x -= 20;
-  if (e.key === "ArrowRight" && player.x < canvas.width - player.width) player.x += 20;
-});
