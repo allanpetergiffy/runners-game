@@ -1,14 +1,11 @@
 body {
-  margin: 0;
-  overflow: hidden;
-  background: linear-gradient(to top, #87ceeb, #ffffff);
+  text-align: center;
   font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: white;
 }
 
-#scoreBoard {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  color: black;
-  font-size: 20px;
+canvas {
+  border: 2px solid #fff;
+  background: #87ceeb; /* sky blue */
 }
