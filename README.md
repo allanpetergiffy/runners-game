@@ -1,23 +1,37 @@
 # 🏃 Runners Game
 
-An endless runner game built with **HTML5 Canvas**, **CSS**, and **JavaScript**.  
-The player controls a runner who must jump over obstacles while the background scrolls.  
-Score increases the longer you survive!
+An endless runner inspired by **Subway Surfers**, built with **HTML5 Canvas**, **CSS**, and **JavaScript**.  
+Jump over obstacles, survive as long as possible, and chase the highest score!
 
 ---
 
-## 🎮 How to Play
-- Press **SPACE** to jump.
-- Avoid red obstacles.
-- Survive as long as possible to increase your score.
-- Game restarts automatically when you collide.
+## 🎮 Play Online
+👉 [Play Runners Game](https://allanpetergiffy.github.io/runners-game/)
 
 ---
 
-## 📂 Project Structure
+## 🚀 Features
+- Addictive endless runner gameplay
+- Dynamic obstacle generation
+- Score tracking based on survival time
+- Auto-restart on collision
 
-## ✨ Future Improvements
-- Animated runner sprites
-- Restart button instead of auto‑reload
-- High score tracking with `localStorage`
-- Sound effects for jump and collision
+---
+
+## 📸 Demo
+*(Add a screenshot or GIF of gameplay here)*
+
+---
+
+## 🛠 Getting Started
+
+### Prerequisites
+- A modern web browser (Chrome, Firefox, Edge)
+
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/allanpetergiffy/runners-game.git
+
+# Navigate into the folder
+cd runners-game
