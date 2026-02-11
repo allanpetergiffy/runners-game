@@ -1,92 +1,175 @@
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+// Canvas setup
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
-// Load images
-const runnerImg = new Image();
-runnerImg.src = "assets/runner.png";
-
-const obstacleImg = new Image();
-obstacleImg.src = "assets/obstacle.png";
-
-const bgImg = new Image();
-bgImg.src = "assets/background.png";
-
-// Runner properties
-let runner = {
+// Player setup
+const player = {
   x: 50,
-  y: 300,
-  width: 50,
-  height: 50,
-  dy: 0,
-  gravity: 0.8,
-  jumpPower: -12
+  y: canvas.height - 50,
+  width: 40,
+  height: 40,
+  velocityY: 0,
+  gravity: 1
 };
 
+// Obstacles
 let obstacles = [];
-let score = 0;
-let gameOver = false;
-let bgX = 0;
+let obstacleSpeed = 5;
 
-// Jump control
-document.addEventListener("keydown", e => {
-  if (e.code === "Space" && runner.y >= 300) {
-    runner.dy = runner.jumpPower;
-  }
+// Score
+let score = 0;
+let highScore = localStorage.getItem('highScore') || 0;
+
+// Game loop reference
+let gameLoop;
+
+// Sounds
+const jumpSound = new Audio('assets/jump.mp3');
+const crashSound = new Audio('assets/crash.mp3');
+
+// Controls
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space') jump();
+});
+document.addEventListener('touchstart', () => {
+  jump();
 });
 
-// Spawn obstacles
-function spawnObstacle() {
-  obstacles.push({ x: 800, y: 320, width: 50, height: 50 });
+// Jump function
+function jump() {
+  if (player.y === canvas.height - player.height) {
+    player.velocityY = -15;
+    jumpSound.play();
+  }
 }
-setInterval(spawnObstacle, 2000);
 
-// Update game
-function update() {
-  if (gameOver) return;
+// Update player
+function updatePlayer() {
+  player.y += player.velocityY;
+  player.velocityY += player.gravity;
 
-  runner.y += runner.dy;
-  runner.dy += runner.gravity;
-  if (runner.y > 300) runner.y = 300;
+  if (player.y > canvas.height - player.height) {
+    player.y = canvas.height - player.height;
+    player.velocityY = 0;
+  }
+}
 
-  obstacles.forEach(o => o.x -= 5);
+// Draw player
+function drawPlayer() {
+  ctx.fillStyle = 'blue';
+  ctx.fillRect(player.x, player.y, player.width, player.height);
+}
 
-  obstacles.forEach(o => {
-    if (
-      runner.x < o.x + o.width &&
-      runner.x + runner.width > o.x &&
-      runner.y < o.y + o.height &&
-      runner.y + runner.height > o.y
-    ) {
-      gameOver = true;
-      alert("Game Over! Final Score: " + score);
-      document.location.reload();
-    }
+// Create obstacles
+function createObstacle() {
+  const obstacle = {
+    x: canvas.width,
+    y: canvas.height - 40,
+    width: 40,
+    height: 40
+  };
+  obstacles.push(obstacle);
+}
+
+// Update obstacles
+function updateObstacles() {
+  obstacles.forEach(obstacle => {
+    obstacle.x -= obstacleSpeed;
   });
 
-  score++;
-  bgX -= 2;
-  if (bgX <= -canvas.width) bgX = 0;
+  obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.width > 0);
+
+  // Difficulty scaling
+  if (score % 500 === 0 && score !== 0) {
+    obstacleSpeed += 1;
+  }
 }
 
-// Draw game
-function draw() {
+// Draw obstacles
+function drawObstacles() {
+  ctx.fillStyle = 'red';
+  obstacles.forEach(obstacle => {
+    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+  });
+}
+
+// Collision detection
+function checkCollision() {
+  obstacles.forEach(obstacle => {
+    if (
+      player.x < obstacle.x + obstacle.width &&
+      player.x + player.width > obstacle.x &&
+      player.y < obstacle.y + obstacle.height &&
+      player.y + player.height > obstacle.y
+    ) {
+      crashSound.play();
+      gameOver();
+    }
+  });
+}
+
+// Score update
+function updateScore() {
+  score++;
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem('highScore', highScore);
+  }
+  document.getElementById('scoreDisplay').innerText =
+    `Score: ${score} | High Score: ${highScore}`;
+}
+
+// Game over
+function gameOver() {
+  cancelAnimationFrame(gameLoop);
+
+  const gameOverDiv = document.createElement('div');
+  gameOverDiv.innerHTML = `
+    <h2>Game Over</h2>
+    <p>Your score: ${score}</p>
+    <button id="restartBtn">Restart</button>
+  `;
+  gameOverDiv.style.textAlign = 'center';
+  document.body.appendChild(gameOverDiv);
+
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    document.body.removeChild(gameOverDiv);
+    resetGame();
+  });
+}
+
+// Reset game
+function resetGame() {
+  score = 0;
+  obstacles = [];
+  obstacleSpeed = 5;
+  player.y = canvas.height - player.height;
+  startGame();
+}
+
+// Main game loop
+function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.drawImage(bgImg, bgX, 0, canvas.width, canvas.height);
-  ctx.drawImage(bgImg, bgX + canvas.width, 0, canvas.width, canvas.height);
+  updatePlayer();
+  drawPlayer();
 
-  ctx.drawImage(runnerImg, runner.x, runner.y, runner.width, runner.height);
-  obstacles.forEach(o => ctx.drawImage(obstacleImg, o.x, o.y, o.width, o.height));
+  updateObstacles();
+  drawObstacles();
 
-  ctx.fillStyle = "white";
-  ctx.font = "20px Arial";
-  ctx.fillText("Score: " + score, 650, 30);
+  checkCollision();
+  updateScore();
+
+  gameLoop = requestAnimationFrame(loop);
 }
 
-// Game loop
-function loop() {
-  update();
-  draw();
-  requestAnimationFrame(loop);
+// Start game
+function startGame() {
+  setInterval(createObstacle, 2000); // spawn obstacle every 2s
+  loop();
 }
-loop();
+
+// Initialize
+document.getElementById('scoreDisplay').innerText =
+  `Score: ${score} | High Score: ${highScore}`;
+startGame();
