@@ -19,7 +19,12 @@ Jump over obstacles, survive as long as possible, and chase the highest score!
 ---
 
 ## 📸 Demo
-*(screenshot.png)*
+![Gameplay Screenshot](assets/screenshot.png)
+<p align="center">
+  <img src="assets/screenshot.png" width="500" alt="Gameplay Screenshot">
+</p>
+[![Gameplay Screenshot](assets/screenshot.png)](https://allanpetergiffy.github.io/runners-game/)
+
 
 ---
 
