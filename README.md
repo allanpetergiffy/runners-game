@@ -19,7 +19,7 @@ Jump over obstacles, survive as long as possible, and chase the highest score!
 ---
 
 ## 📸 Demo
-*(Add a screenshot or GIF of gameplay here)*
+*(screenshot.png)*
 
 ---
 
