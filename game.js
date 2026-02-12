@@ -5,16 +5,27 @@ const ctx = canvas.getContext('2d');
 // Player setup
 const player = {
   x: 50,
-  y: canvas.height - 50,
-  width: 40,
-  height: 40,
+  y: canvas.height - 100,
+  width: 80,
+  height: 80,
   velocityY: 0,
   gravity: 1
 };
 
+// Runner GIF
+const runnerSprite = new Image();
+runnerSprite.src = 'assets/runner.gif';
+
+// Background
+const background = new Image();
+background.src = 'assets/background.png';
+let bgX = 0;
+
 // Obstacles
 let obstacles = [];
 let obstacleSpeed = 5;
+const obstacleSprite = new Image();
+obstacleSprite.src = 'assets/obstacle.png';
 
 // Score
 let score = 0;
@@ -25,7 +36,6 @@ let gameLoop;
 
 // Sounds
 const jumpSound = new Audio('assets/jump.mp3');
-const crashSound = new Audio('assets/crash.mp3');
 
 // Controls
 document.addEventListener('keydown', e => {
@@ -56,17 +66,16 @@ function updatePlayer() {
 
 // Draw player
 function drawPlayer() {
-  ctx.fillStyle = 'blue';
-  ctx.fillRect(player.x, player.y, player.width, player.height);
+  ctx.drawImage(runnerSprite, player.x, player.y, player.width, player.height);
 }
 
 // Create obstacles
 function createObstacle() {
   const obstacle = {
     x: canvas.width,
-    y: canvas.height - 40,
-    width: 40,
-    height: 40
+    y: canvas.height - 60,
+    width: 50,
+    height: 50
   };
   obstacles.push(obstacle);
 }
@@ -87,9 +96,8 @@ function updateObstacles() {
 
 // Draw obstacles
 function drawObstacles() {
-  ctx.fillStyle = 'red';
   obstacles.forEach(obstacle => {
-    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+    ctx.drawImage(obstacleSprite, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
   });
 }
 
@@ -102,7 +110,6 @@ function checkCollision() {
       player.y < obstacle.y + obstacle.height &&
       player.y + player.height > obstacle.y
     ) {
-      crashSound.play();
       gameOver();
     }
   });
@@ -147,10 +154,19 @@ function resetGame() {
   startGame();
 }
 
+// Draw background
+function drawBackground() {
+  bgX -= 2;
+  if (bgX <= -canvas.width) bgX = 0;
+  ctx.drawImage(background, bgX, 0, canvas.width, canvas.height);
+  ctx.drawImage(background, bgX + canvas.width, 0, canvas.width, canvas.height);
+}
+
 // Main game loop
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  drawBackground();
   updatePlayer();
   drawPlayer();
 
