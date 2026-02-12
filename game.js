@@ -33,6 +33,7 @@ let highScore = localStorage.getItem('highScore') || 0;
 
 // Game loop reference
 let gameLoop;
+let obstacleInterval;
 
 // Sounds
 const jumpSound = new Audio('assets/jump.mp3');
@@ -129,6 +130,7 @@ function updateScore() {
 // Game over
 function gameOver() {
   cancelAnimationFrame(gameLoop);
+  clearInterval(obstacleInterval);
 
   const gameOverDiv = document.createElement('div');
   gameOverDiv.innerHTML = `
@@ -181,7 +183,7 @@ function loop() {
 
 // Start game
 function startGame() {
-  setInterval(createObstacle, 2000); // spawn obstacle every 2s
+  obstacleInterval = setInterval(createObstacle, 2000); // spawn obstacle every 2s
   loop();
 }
 
