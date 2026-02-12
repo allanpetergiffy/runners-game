@@ -25,6 +25,15 @@ Jump over obstacles, survive as long as possible, and chase the highest score!
 </p>
 [![Gameplay Screenshot](assets/screenshot.png)](https://allanpetergiffy.github.io/runners-game/)
 
+## 🤝 Contributing
+Contributions are welcome!  
+Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
+
+## 📄 License
+This project is licensed under the MIT License.  
+See the [LICENSE](LICENSE) file for details.
 
 ---
 
